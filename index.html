@@ -42,7 +42,8 @@
 
         .table-container {
             border-radius: 16px;
-            overflow: hidden; 
+            overflow-x: auto; /* เปลี่ยนเป็นโหมดเลื่อนซ้ายขวา */
+            -webkit-overflow-scrolling: touch; /* เพิ่มความลื่นไหลเวลาใช้นิ้วปัดบน iPhone */
             box-shadow: 0 8px 24px rgba(0,0,0,0.04);
             background: var(--table-bg);
             max-width: 1100px;
@@ -58,6 +59,7 @@
             padding: 16px 20px; 
             text-align: left; 
             border-bottom: 1px solid #f4f4f4; 
+            white-space: nowrap; /* สั่งไม่ให้ข้อความตัดขึ้นบรรทัดใหม่ */
         }
 
         th { 
@@ -191,3 +193,4 @@
     </script>
 </body>
 </html>
+
