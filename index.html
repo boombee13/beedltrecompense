@@ -19,121 +19,44 @@
             --text-main: #6b6b6b;
             --btn-map: #b5ead7; 
             --btn-map-hover: #9bd6c2;
+            --btn-action: #ffbba6;
+            --btn-action-hover: #ffa48a;
             --link-color: #a2add0; 
             --tab-bg: #f1f1f1;
-            --tab-active: #ffbba6; /* สี Tab ที่ถูกเลือก */
+            --tab-active: #ffbba6; 
         }
         
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            padding: 30px 15px; 
-            background-color: var(--bg-color); 
-            color: var(--text-main);
-            margin: 0;
-            font-size: 15px; 
-        }
+        body { font-family: 'Sarabun', sans-serif; padding: 30px 15px; background-color: var(--bg-color); color: var(--text-main); margin: 0; font-size: 15px; }
+        h2 { text-align: center; color: #7b7b7b; margin-bottom: 20px; font-weight: 600; }
+        
+        .tabs-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { font-family: 'Sarabun', sans-serif; padding: 10px 24px; border: none; background-color: var(--tab-bg); color: var(--text-main); border-radius: 25px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .tab-btn:hover { background-color: #e2e2e2; }
+        .tab-btn.active { background-color: var(--tab-active); color: white; box-shadow: 0 4px 10px rgba(255, 187, 166, 0.4); }
 
-        h2 {
-            text-align: center;
-            color: #7b7b7b;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        /* ตกแต่งส่วนของ Tab เมนู */
-        .tabs-container {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* ให้ปุ่มตัดขึ้นบรรทัดใหม่บนมือถือจอเล็ก */
-        }
-
-        .tab-btn {
-            font-family: 'Sarabun', sans-serif; 
-            padding: 10px 24px;
-            border: none;
-            background-color: var(--tab-bg);
-            color: var(--text-main);
-            border-radius: 25px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover {
-            background-color: #e2e2e2;
-        }
-
-        .tab-btn.active {
-            background-color: var(--tab-active);
-            color: white;
-            box-shadow: 0 4px 10px rgba(255, 187, 166, 0.4);
-        }
-
-        /* ตกแต่งตารางและแก้ปัญหาบนมือถือ */
-        .table-container {
-            border-radius: 16px;
-            overflow-x: auto; /* เลื่อนซ้ายขวาได้ */
-            -webkit-overflow-scrolling: touch; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-            background: var(--table-bg);
-            max-width: 1100px;
-            margin: 0 auto; 
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 800px; /* บังคับความกว้างขั้นต่ำไม่ให้ตารางเบียดกันเกินไป */
-        }
-
-        th, td { 
-            padding: 16px 20px; 
-            text-align: left; 
-            border-bottom: 1px solid #f4f4f4; 
-            white-space: nowrap; /* ไม่ให้ข้อความตัดขึ้นบรรทัดใหม่ */
-        }
-
-        th { 
-            background-color: var(--header-bg); 
-            color: var(--header-text); 
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background-color: var(--row-hover); transition: background 0.2s ease; }
+        .table-container { border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 8px 24px rgba(0,0,0,0.04); background: var(--table-bg); max-width: 1100px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid #f4f4f4; white-space: nowrap; }
+        th { background-color: var(--header-bg); color: var(--header-text); font-weight: 600; font-size: 16px; }
+        tr:hover td { background-color: var(--row-hover); }
 
         a.link-text { color: var(--link-color); text-decoration: none; font-weight: 600; }
         a.link-text:hover { text-decoration: underline; }
 
-        a.btn { 
-            display: inline-block; 
-            padding: 8px 18px; 
-            background: var(--btn-map); 
-            color: #5a7065; 
-            text-decoration: none; 
-            border-radius: 20px; 
-            font-size: 14px; 
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+        a.btn { display: inline-block; padding: 8px 18px; background: var(--btn-map); color: #5a7065; text-decoration: none; border-radius: 20px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; }
         a.btn:hover { background: var(--btn-map-hover); transform: translateY(-1px); }
+
+        /* ปุ่มสั่งย้ายรูป */
+        button.btn-action { font-family: 'Sarabun', sans-serif; padding: 8px 18px; background: var(--btn-action); color: white; border: none; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        button.btn-action:hover { background: var(--btn-action-hover); transform: translateY(-1px); }
+        button.btn-action:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         
-        .status-badge {
-            background-color: #f1f1f1;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: #777;
-        }
+        .status-badge { background-color: #f1f1f1; padding: 6px 12px; border-radius: 12px; font-size: 14px; color: #777; }
     </style>
 </head>
 <body>
 
-    <h2>✨ รายการรูปภาพและสถานที่</h2>
+    <h2>✨ ระบบตรวจสอบและจัดการรูปภาพ</h2>
     
     <div class="tabs-container">
         <button class="tab-btn active" onclick="filterData('ทั้งหมด', this)">ทั้งหมด (All)</button>
@@ -152,19 +75,22 @@
                     <th>District</th>
                     <th>Location</th>
                     <th>Status</th>
-                </tr>
+                    <th>จัดการ</th> </tr>
             </thead>
             <tbody>
-                <tr><td colspan="7" style="text-align:center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
+                <tr><td colspan="8" style="text-align:center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        // 🚨 อย่าลืมใส่ API URL ของคุณนะครับ 🚨
+        // 🚨 1. ใส่ API ของ Google Apps Script
         const API_URL = 'https://script.google.com/macros/s/AKfycbwoKn0sBWgxZVHenqQJn-ky8ttWxREAoZykk4qnCUMEsBP48KyXhCC2upufaPzlJXo/exec'; 
         
-        let allData = []; // ตัวแปรสำหรับเก็บข้อมูลทั้งหมดที่ดึงมา
+        // 🚨 2. ใส่ Webhook URL ของ n8n (ตัวที่คุณเพิ่งสร้าง)
+        const N8N_WEBHOOK_URL = 'https://boombee130.app.n8n.cloud/webhook-test/trigger-move';
+
+        let allData = []; 
 
         async function fetchData() {
             try {
@@ -176,14 +102,13 @@
                     return actualKey ? row[actualKey] : '';
                 };
 
-                // กรองเอาเฉพาะข้อมูลที่มี Date หรือ Link แล้วเก็บลงตัวแปร allData
                 allData = data.filter(row => {
                     const dateVal = getValue(row, 'Date');
                     const linkVal = getValue(row, 'Link');
                     return (dateVal !== '' && dateVal !== undefined) || (linkVal !== '' && linkVal !== undefined);
                 }).map(row => {
-                    // จัดรูปแบบข้อมูลให้เรียกใช้ง่ายขึ้น
                     return {
+                        rowNumber: row['rowNumber'], // เก็บเลขบรรทัดไว้ใช้ส่งให้ n8n
                         date: getValue(row, 'Date'),
                         time: getValue(row, 'Time'),
                         link: getValue(row, 'Link'),
@@ -194,22 +119,18 @@
                     };
                 });
 
-                // ตอนโหลดเสร็จครั้งแรก ให้แสดงข้อมูล "ทั้งหมด" ก่อน
                 renderTable(allData);
-
             } catch (error) {
-                console.error('Error fetching data:', error);
-                document.querySelector('#dataTable tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: #ff8b8b;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+                document.querySelector('#dataTable tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: #ff8b8b;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
             }
         }
 
-        // ฟังก์ชันสำหรับสร้างตาราง
         function renderTable(dataToRender) {
             const tbody = document.querySelector('#dataTable tbody');
             tbody.innerHTML = ''; 
 
             if (dataToRender.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: #aaa;">ไม่พบข้อมูลในสถานะนี้</td></tr>';
+                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: #aaa;">ไม่พบข้อมูล</td></tr>';
                  return;
             }
 
@@ -217,6 +138,11 @@
                 const tr = document.createElement('tr');
                 const linkImg = row.link ? `<a href="${row.link}" class="link-text" target="_blank">ดูรูปภาพ</a>` : '-';
                 const linkMap = row.location ? `<a href="${row.location}" class="btn" target="_blank">เปิด Google Maps</a>` : '-';
+                
+                // เช็กว่าถ้าย้ายแล้ว ไม่ต้องโชว์ปุ่มให้กดซ้ำ
+                const actionBtn = (row.status === 'Moved' || row.status === 'ย้ายแล้ว') 
+                    ? `<span style="color: #aaa; font-size: 13px;">เสร็จสิ้น</span>` 
+                    : `<button class="btn-action" onclick="triggerMove('${row.rowNumber}', this)">สั่งย้าย</button>`;
 
                 tr.innerHTML = `
                     <td>${row.date || '-'}</td>
@@ -225,19 +151,17 @@
                     <td>${row.subDistrict || '-'}</td>
                     <td>${row.district || '-'}</td>
                     <td>${linkMap}</td>
-                    <td><span class="status-badge">${row.status}</span></td>
+                    <td><span class="status-badge status-text">${row.status}</span></td>
+                    <td>${actionBtn}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // ฟังก์ชันสำหรับกรองข้อมูลเมื่อกดปุ่ม Tab
         function filterData(statusFilter, btnElement) {
-            // ลบ class 'active' ออกจากปุ่มทั้งหมด แล้วไปใส่ให้ปุ่มที่เพิ่งถูกกด
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
 
-            // กรองข้อมูล
             if (statusFilter === 'ทั้งหมด') {
                 renderTable(allData);
             } else {
@@ -246,7 +170,28 @@
             }
         }
 
-        // สั่งทำงานเมื่อโหลดหน้าเว็บ
+        // ฟังก์ชันสั่งงาน n8n
+        async function triggerMove(rowNumber, btnElement) {
+            btnElement.innerText = "กำลังสั่ง...";
+            btnElement.disabled = true; // ล็อกปุ่มกันกดเบิ้ล
+
+            try {
+                // ส่งคำสั่งไปที่ n8n โดยแนบเลขบรรทัด (?row=...) ไปด้วย (ใช้ mode no-cors เพื่อป้องกัน Error ข้ามโดเมน)
+                await fetch(`${N8N_WEBHOOK_URL}?row=${rowNumber}`, { mode: 'no-cors' });
+                
+                // เปลี่ยนสถานะโชว์บนหน้าเว็บให้ผู้ใช้ดูว่าสั่งไปแล้ว (เดี๋ยว Workflow 2 ของคุณจะทำงานต่อเอง)
+                btnElement.innerText = "สั่งแล้ว";
+                const tr = btnElement.closest('tr');
+                tr.querySelector('.status-text').innerText = "กำลังย้าย...";
+                tr.querySelector('.status-text').style.backgroundColor = "#fff3cd";
+
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ n8n");
+                btnElement.innerText = "สั่งย้าย";
+                btnElement.disabled = false;
+            }
+        }
+
         fetchData();
     </script>
 </body>
