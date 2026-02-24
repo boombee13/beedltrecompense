@@ -45,18 +45,19 @@
                 const tbody = document.querySelector('#dataTable tbody');
                 tbody.innerHTML = ''; // เคลียร์ข้อความกำลังโหลด
 
-                // วนลูปสร้างตารางจากข้อมูลที่ได้
-                data.forEach(row => {
-                    // สมมติว่าใน Sheet คุณตั้งชื่อหัวคอลัมน์ไว้ตามนี้
-                    // หากชื่อต่างไปจากนี้ ให้เปลี่ยนชื่อตัวแปรในวงเล็บก้ามปูให้ตรงกันนะครับ
+                // 1. กรองข้อมูลเอาเฉพาะแถวที่มี Date จริงๆ (ตัดแถวว่างที่มีแค่ Dropdown ทิ้ง)
+                const validData = data.filter(row => row['Date'] !== undefined && row['Date'] !== '');
+
+                // 2. วนลูปสร้างตาราง โดยใช้ Key ให้ตรงกับหัวคอลัมน์ (Row 1) ใน Sheet เป๊ะๆ
+                validData.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${row['Date'] || '-'}</td>
                         <td>${row['Time'] || '-'}</td>
-                        <td><a href="${row['Link']}" target="_blank">ดูรูปภาพ</a></td>
+                        <td><a href="${row['Link'] || '#'}" target="_blank">ดูรูปภาพ</a></td>
                         <td>${row['Sub District'] || '-'}</td>
                         <td>${row['District'] || '-'}</td>
-                        <td><a href="${row['Location']}" class="btn" target="_blank">เปิด Google Maps</a></td>
+                        <td><a href="${row['Location'] || '#'}" class="btn" target="_blank">เปิด Google Maps</a></td>
                         <td>${row['Status'] || 'รอดำเนินการ'}</td>
                     `;
                     tbody.appendChild(tr);
@@ -71,4 +72,5 @@
         fetchData();
     </script>
 </body>
+
 </html>
