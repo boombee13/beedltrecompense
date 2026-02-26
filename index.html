@@ -46,21 +46,24 @@
         a.btn { display: inline-block; padding: 8px 18px; background: var(--btn-map); color: #5a7065; text-decoration: none; border-radius: 20px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; }
         a.btn:hover { background: var(--btn-map-hover); transform: translateY(-1px); }
 
-        /* ปุ่มสั่งย้ายรูป */
         button.btn-action { font-family: 'Sarabun', sans-serif; padding: 8px 18px; background: var(--btn-action); color: white; border: none; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         button.btn-action:hover { background: var(--btn-action-hover); transform: translateY(-1px); }
         button.btn-action:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         
         .status-badge { background-color: #f1f1f1; padding: 6px 12px; border-radius: 12px; font-size: 14px; color: #777; }
+        
+        /* สัญลักษณ์โหลดข้อมูลแอบๆ มุมขวาบน */
+        #loadingIndicator { position: fixed; top: 15px; right: 20px; font-size: 13px; color: #aaa; display: none; }
     </style>
 </head>
 <body>
 
+    <div id="loadingIndicator">🔄 กำลังอัปเดต...</div>
     <h2>✨ ระบบตรวจสอบและจัดการรูปภาพ</h2>
     
     <div class="tabs-container">
-        <button class="tab-btn active" onclick="filterData('ทั้งหมด', this)">ทั้งหมด (All)</button>
-        <button class="tab-btn" onclick="filterData('รอดำเนินการ', this)">รอดำเนินการ</button>
+        <button class="tab-btn" onclick="filterData('ทั้งหมด', this)">ทั้งหมด (All)</button>
+        <button class="tab-btn active" onclick="filterData('รอดำเนินการ', this)">รอดำเนินการ</button>
         <button class="tab-btn" onclick="filterData('Moved', this)">ย้ายแล้ว (Moved)</button>
     </div>
     
@@ -77,24 +80,30 @@
                     <th>Province</th>
                     <th>Location</th>
                     <th>Status</th>
-                    <th>จัดการ</th> </tr>
+                    <th>จัดการ</th>
+                </tr>
             </thead>
             <tbody>
-                <tr><td colspan="8" style="text-align:center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
+                <tr><td colspan="10" style="text-align:center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        // 🚨 1. ใส่ API ของ Google Apps Script
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwoKn0sBWgxZVHenqQJn-ky8ttWxREAoZykk4qnCUMEsBP48KyXhCC2upufaPzlJXo/exec'; 
-        
-        // 🚨 2. ใส่ Webhook URL ของ n8n (ตัวที่คุณเพิ่งสร้าง)
-        const N8N_WEBHOOK_URL = 'https://boombee130.app.n8n.cloud/webhook/trigger-move';
+        // 🚨 อย่าลืมแก้ API URL ทั้ง 2 ตัวของคุณเหมือนเดิมนะครับ
+        const API_URL = 'YOUR_GAS_API_URL'; 
+        const N8N_WEBHOOK_URL = 'YOUR_N8N_WEBHOOK_URL';
 
         let allData = []; 
+        let currentFilter = 'รอดำเนินการ'; // ตั้งค่า Default Tab
+        let processingRows = []; // ตัวแปรเก็บแถวที่กำลังย้าย ป้องกันข้อมูลกระตุก
 
-        async function fetchData() {
+        // ฟังก์ชันดึงข้อมูล (isAutoRefresh = true จะโหลดแบบเงียบๆ ไม่เคลียร์ตาราง)
+        async function fetchData(isAutoRefresh = false) {
+            if (isAutoRefresh) {
+                document.getElementById('loadingIndicator').style.display = 'block';
+            }
+
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
@@ -110,7 +119,7 @@
                     return (dateVal !== '' && dateVal !== undefined) || (linkVal !== '' && linkVal !== undefined);
                 }).map(row => {
                     return {
-                        rowNumber: row['rowNumber'], // เก็บเลขบรรทัดไว้ใช้ส่งให้ n8n
+                        rowNumber: row['rowNumber'],
                         date: getValue(row, 'Date'),
                         time: getValue(row, 'Time'),
                         link: getValue(row, 'Link'),
@@ -123,18 +132,23 @@
                     };
                 });
 
-                renderTable(allData);
+                applyCurrentFilter(); // อัปเดตตารางตาม Tab ปัจจุบัน
             } catch (error) {
-                document.querySelector('#dataTable tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: #ff8b8b;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+                console.error("Fetch Error:", error);
+            } finally {
+                if (isAutoRefresh) {
+                    setTimeout(() => document.getElementById('loadingIndicator').style.display = 'none', 1000);
+                }
             }
         }
 
+        // ฟังก์ชันสร้างตาราง
         function renderTable(dataToRender) {
             const tbody = document.querySelector('#dataTable tbody');
             tbody.innerHTML = ''; 
 
             if (dataToRender.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: #aaa;">ไม่พบข้อมูล</td></tr>';
+                 tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 40px; color: #aaa;">ไม่มีข้อมูลในสถานะ ${currentFilter}</td></tr>`;
                  return;
             }
 
@@ -143,10 +157,22 @@
                 const linkImg = row.link ? `<a href="${row.link}" class="link-text" target="_blank">ดูรูปภาพ</a>` : '-';
                 const linkMap = row.location ? `<a href="${row.location}" class="btn" target="_blank">เปิด Google Maps</a>` : '-';
                 
-                // เช็กว่าถ้าย้ายแล้ว ไม่ต้องโชว์ปุ่มให้กดซ้ำ
-                const actionBtn = (row.status === 'Moved' || row.status === 'ย้ายแล้ว') 
-                    ? `<span style="color: #aaa; font-size: 13px;">เสร็จสิ้น</span>` 
-                    : `<button class="btn-action" onclick="triggerMove('${row.rowNumber}', this)">สั่งย้าย</button>`;
+                // ระบบเช็กสถานะล็อกปุ่ม
+                const isMoved = (row.status.toLowerCase() === 'moved' || row.status === 'ย้ายแล้ว' || row.status === 'reported');
+                const isProcessing = processingRows.includes(row.rowNumber.toString());
+
+                let actionBtn = '';
+                if (isMoved) {
+                    actionBtn = `<span style="color: #aaa; font-size: 13px;">เสร็จสิ้น</span>`;
+                    // ปลดล็อกแถวเมื่อย้ายเสร็จจริงใน Sheet
+                    if (isProcessing) {
+                        processingRows = processingRows.filter(r => r !== row.rowNumber.toString());
+                    }
+                } else if (isProcessing) {
+                    actionBtn = `<span style="color: #f39c12; font-size: 13px; font-weight: 600;">กำลังดำเนินการ...</span>`;
+                } else {
+                    actionBtn = `<button class="btn-action" onclick="triggerMove('${row.rowNumber}', this)">สั่งย้าย</button>`;
+                }
 
                 tr.innerHTML = `
                     <td>${row.date || '-'}</td>
@@ -164,44 +190,52 @@
             });
         }
 
-        function filterData(statusFilter, btnElement) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-
-            if (statusFilter === 'ทั้งหมด') {
+        // ฟังก์ชันแสดงข้อมูลตาม Tab
+        function applyCurrentFilter() {
+            if (currentFilter === 'ทั้งหมด') {
                 renderTable(allData);
             } else {
-                const filteredData = allData.filter(row => row.status === statusFilter);
+                // กรองข้อมูล (รองรับคำว่า Moved และ ย้ายแล้ว ให้เป็นกลุ่มเดียวกัน)
+                const filteredData = allData.filter(row => {
+                    if (currentFilter === 'Moved') {
+                        return row.status.toLowerCase() === 'moved' || row.status === 'ย้ายแล้ว' || row.status === 'reported';
+                    }
+                    return row.status === currentFilter;
+                });
                 renderTable(filteredData);
             }
         }
 
-        // ฟังก์ชันสั่งงาน n8n
+        // เมื่อผู้ใช้กดคลิกเปลี่ยน Tab
+        function filterData(statusFilter, btnElement) {
+            currentFilter = statusFilter;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            applyCurrentFilter();
+        }
+
+        // เมื่อกดสั่งย้าย
         async function triggerMove(rowNumber, btnElement) {
-            btnElement.innerText = "กำลังสั่ง...";
-            btnElement.disabled = true; // ล็อกปุ่มกันกดเบิ้ล
+            processingRows.push(rowNumber.toString()); // ล็อกแถวนี้ไว้
+            btnElement.outerHTML = `<span style="color: #f39c12; font-size: 13px; font-weight: 600;">กำลังสั่ง...</span>`;
 
             try {
-                // ส่งคำสั่งไปที่ n8n โดยแนบเลขบรรทัด (?row=...) ไปด้วย (ใช้ mode no-cors เพื่อป้องกัน Error ข้ามโดเมน)
                 await fetch(`${N8N_WEBHOOK_URL}?row=${rowNumber}`, { mode: 'no-cors' });
-                
-                // เปลี่ยนสถานะโชว์บนหน้าเว็บให้ผู้ใช้ดูว่าสั่งไปแล้ว (เดี๋ยว Workflow 2 ของคุณจะทำงานต่อเอง)
-                btnElement.innerText = "สั่งแล้ว";
-                const tr = btnElement.closest('tr');
-                tr.querySelector('.status-text').innerText = "กำลังย้าย...";
-                tr.querySelector('.status-text').style.backgroundColor = "#fff3cd";
-
             } catch (error) {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ n8n");
-                btnElement.innerText = "สั่งย้าย";
-                btnElement.disabled = false;
+                alert("เกิดข้อผิดพลาดในการสั่งงาน n8n");
+                processingRows = processingRows.filter(r => r !== rowNumber.toString()); // ปลดล็อกถ้าเกิด Error
+                fetchData(true);
             }
         }
 
+        // ทำงานเมื่อเปิดเว็บครั้งแรก
         fetchData();
+
+        // 🚨 สั่งให้แอบโหลดข้อมูลใหม่ (Auto-Refresh) ทุกๆ 12 วินาที
+        setInterval(() => {
+            fetchData(true);
+        }, 12000);
+
     </script>
 </body>
 </html>
-
-
-
